@@ -1,11 +1,19 @@
 package com.example.democooldrawer;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 /**
@@ -13,6 +21,9 @@ import android.view.ViewGroup;
  */
 public class VaccinationFragment extends Fragment {
 
+    Button btn;
+    TextView tv;
+    EditText etEdit;
 
     public VaccinationFragment() {
         // Required empty public constructor
@@ -20,10 +31,67 @@ public class VaccinationFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.vaccinationfragment, container, false);
+        View view = inflater.inflate(R.layout.vaccinationfragment, container, false);
+
+        btn = view.findViewById(R.id.btnEdit);
+        tv = view.findViewById(R.id.tv);
+
+        // Step 2a : Obtain an instance of the SharedPreferences
+        SharedPreferences pref = getContext().getSharedPreferences("pref", MODE_PRIVATE);
+
+        // Step 2b : Retrieve the saved data from the SharedPreferences object
+        String msg = pref.getString("myText3","Nothing");
+
+        // Step 2c : Update the UI element with the value
+        tv.setText(msg);
+
+
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View view1 = inflater.inflate(R.layout.activity_dialog, null);
+                etEdit = view1.findViewById(R.id.etEdit);
+                etEdit.setText(tv.getText().toString());
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Edit Vaccination").setView(view1).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        tv.setText(etEdit.getText().toString());
+
+                        // Step 1b : Obtain an instance of the SharedPreferences
+                        SharedPreferences pref = getContext().getSharedPreferences("pref", MODE_PRIVATE);
+
+                        // Step 1c : Obtain an instance of the SharedPreferences Editor for update later
+                        SharedPreferences.Editor prefEdit = pref.edit();
+
+                        // Step1d : Add the key-value pair
+                        // The value should be from the variable defined in Step 1a
+                        prefEdit.putString("myText3", etEdit.getText().toString());
+
+                        // Step 1e : Call commit() method to save the changes into SharedPreferences
+                        prefEdit.commit();
+
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.show();
+
+            }
+        });
+
+
+
+        return view;
     }
+
+
 
 }

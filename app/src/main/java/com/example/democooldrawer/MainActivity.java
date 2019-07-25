@@ -1,6 +1,8 @@
 package com.example.democooldrawer;
 
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -9,6 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ActionBarDrawerToggle drawerToggle;
 
+    private FloatingActionButton fab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,11 +38,22 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         drawerList = findViewById(R.id.left_drawer);
 
-        drawerItems = new String[]{"Bio", "Vaccination", "Anniversary"};
+        fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //action
+                drawerLayout.openDrawer(Gravity.LEFT);
+            }
+        });
+
+        drawerItems = new String[]{"Bio", "Vaccination", "Anniversary", "About Us"};
         ab = getSupportActionBar();
 
-        aa = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_activated_1, drawerItems);
+//        aa = new ArrayAdapter<String>(this,
+//                android.R.layout.simple_list_item_activated_1, drawerItems);
+
+        aa = new RowAdapter(this, R.layout.row, drawerItems);
         drawerList.setAdapter(aa);
 
         // Set the list's click listener
@@ -53,11 +69,24 @@ public class MainActivity extends AppCompatActivity {
                     fragment = new VaccinationFragment();
                 else if (position == 2)
                     fragment = new AnniversaryFragment();
+                else {
+                    Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+                    startActivity(intent);
+                }
 
-                FragmentManager fm = getSupportFragmentManager();
-                FragmentTransaction trans = fm.beginTransaction();
-                trans.replace(R.id.content_frame, fragment);
-                trans.commit();
+                if (fragment != null) {
+                    FragmentManager fm = getSupportFragmentManager();
+                    FragmentTransaction trans = fm.beginTransaction();
+                    trans.replace(R.id.content_frame, fragment);
+                    trans.commit();
+                }
+
+
+                // ANOTHER METHOD - IF POSITION IS 3
+//                if (position == 3) {
+//                    Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+//                    startActivity(intent);
+//                }
 
                 // Highlight the selected item,
                 //  update the title, and close the drawer
